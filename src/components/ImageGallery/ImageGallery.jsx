@@ -24,7 +24,6 @@ export class ImageGallery extends Component {
     const { page, images, totalImages } = this.state;
     const apiKey = '41687911-62b9e6d772891b12bf67d3c73';
 
-    // If there are no more images to fetch, do nothing
     if (totalImages > 0 && images.length >= totalImages) {
       return;
     }
