@@ -1,65 +1,55 @@
-import React, { Component } from "react";
+import React, { useState, useEffect } from "react";
 import { Searchbar } from "./Searchbar/Searchbar";
 import { ImageGallery } from './ImageGallery/ImageGallery';
 
-export class App extends Component {
-  constructor(props) {
-    super(props);
+export const App = () => {
+  const [query, setQuery] = useState('');
+  const [images, setImages] = useState([]);
+  const [page, setPage] = useState(1);
+  const perPage = 12;
+  const [isLoading, setIsLoading] = useState(false);
+  const [totalImages, setTotalImages] = useState(0);
 
-    this.state = {
-      query: '',
-      images: [],
-      page: 1,
-      perPage: 12,
-      isLoading: false,
-      totalImages: 0,
-    };
-  }
-
-  componentDidUpdate(prevProps, prevState) {
-    if (this.state.query !== prevState.query || this.state.page !== prevState.page) {
-      this.fetchImages();
+  useEffect(() => {
+    if (query !== '' && page > 0) {
+      fetchImages();
     }
-  }
+  }, [query, page]);
 
-  handleSearch = (query) => {
-    this.setState({ query, images: [], page: 1, totalImages: 0 });
+  const handleSearch = (newQuery) => {
+    setQuery(newQuery);
+    setImages([]);
+    setPage(1);
+    setTotalImages(0);
   };
 
-  handleLoadMore = () => {
-    this.setState((prevState) => ({
-      page: prevState.page + 1
-    }));
+  const handleLoadMore = () => {
+    setPage((prevPage) => prevPage + 1);
   };
 
-  fetchImages = () => {
-    const { query, page, perPage } = this.state;
+  const fetchImages = () => {
     const apiKey = '41687911-62b9e6d772891b12bf67d3c73';
     const apiUrl = `https://pixabay.com/api/?q=${query}&page=${page}&key=${apiKey}&image_type=photo&orientation=horizontal&per_page=${perPage}`;
 
-    this.setState({ isLoading: true });
+    setIsLoading(true);
 
     fetch(apiUrl)
       .then((response) => response.json())
       .then((data) => {
-        this.setState((prevState) => ({
-          images: [...prevState.images, ...data.hits],
-          totalImages: data.total,
-          isLoading: false,
-        }));
+        setImages((prevImages) => [...prevImages, ...data.hits]);
+        setTotalImages(data.total);
+        setIsLoading(false);
       })
       .catch((error) => {
         console.error('Error fetching images:', error);
-        this.setState({ isLoading: false });
+        setIsLoading(false);
       });
   };
 
-  render() {
-    const { perPage, query, images, isLoading, totalImages, page } = this.state;
-
-    return (
-      <div>
-        <Searchbar onSubmit={this.handleSearch} />
+  return (
+    <div>
+      <Searchbar onSubmit={handleSearch} />
+      {images.length > 0 && (
         <ImageGallery
           query={query}
           page={page}
@@ -67,9 +57,9 @@ export class App extends Component {
           images={images}
           isLoading={isLoading}
           totalImages={totalImages}
-          onLoadMore={this.handleLoadMore}
+          onLoadMore={handleLoadMore}
         />
-      </div>
-    );
-  }
-}
+      )}
+    </div>
+  );
+};
