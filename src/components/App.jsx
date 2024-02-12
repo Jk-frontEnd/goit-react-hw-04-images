@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Searchbar } from "./Searchbar/Searchbar";
 import { ImageGallery } from './ImageGallery/ImageGallery';
 
@@ -10,24 +10,7 @@ export const App = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [totalImages, setTotalImages] = useState(0);
 
-  useEffect(() => {
-    if (query !== '' && page > 0) {
-      fetchImages();
-    }
-  }, [query, page]);
-
-  const handleSearch = (newQuery) => {
-    setQuery(newQuery);
-    setImages([]);
-    setPage(1);
-    setTotalImages(0);
-  };
-
-  const handleLoadMore = () => {
-    setPage((prevPage) => prevPage + 1);
-  };
-
-  const fetchImages = () => {
+  const fetchImages = useCallback(() => {
     const apiKey = '41687911-62b9e6d772891b12bf67d3c73';
     const apiUrl = `https://pixabay.com/api/?q=${query}&page=${page}&key=${apiKey}&image_type=photo&orientation=horizontal&per_page=${perPage}`;
 
@@ -44,6 +27,23 @@ export const App = () => {
         console.error('Error fetching images:', error);
         setIsLoading(false);
       });
+  }, [query, page, perPage]);
+
+  useEffect(() => {
+    if (query !== '' && page > 0) {
+      fetchImages();
+    }
+  }, [query, page, fetchImages]);
+
+  const handleSearch = (newQuery) => {
+    setQuery(newQuery);
+    setImages([]);
+    setPage(1);
+    setTotalImages(0);
+  };
+
+  const handleLoadMore = () => {
+    setPage((prevPage) => prevPage + 1);
   };
 
   return (
