@@ -13,6 +13,8 @@ export const ImageGallery = (props) => {
 
   return (
     <div>
+      {isLoading && <Loader />} 
+
       {images.length > 0 && (
         <ul className={css.ImageGallery}>
           {images.map((image) => (
@@ -21,13 +23,11 @@ export const ImageGallery = (props) => {
         </ul>
       )}
 
-      {isLoading && <Loader />}
-
       {images.length > 0 && !isLoading && totalImages > images.length && (
         <Button onClick={handleLoadMore}>Load more</Button>
       )}
 
-      {query && images.length === 0 && !isLoading && (
+      {query && images.length === 0 && !isLoading && !totalImages && (
         <p className={css.Message}>
           Sorry! No images were found. Try another keyword for what you are seeking! <br />😊
         </p>

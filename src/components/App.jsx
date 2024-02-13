@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { Searchbar } from "./Searchbar/Searchbar";
 import { ImageGallery } from './ImageGallery/ImageGallery';
+import { Loader } from "./Loader/Loader";
 
 export const App = () => {
   const [query, setQuery] = useState('');
@@ -60,6 +61,7 @@ export const App = () => {
           onLoadMore={handleLoadMore}
         />
       )}
+      {isLoading && Loader }
     </div>
   );
 };
