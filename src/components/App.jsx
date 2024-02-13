@@ -11,24 +11,28 @@ export const App = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [totalImages, setTotalImages] = useState(0);
 
-  const fetchImages = useCallback(() => {
-    const apiKey = '41687911-62b9e6d772891b12bf67d3c73';
-    const apiUrl = `https://pixabay.com/api/?q=${query}&page=${page}&key=${apiKey}&image_type=photo&orientation=horizontal&per_page=${perPage}`;
+ const fetchImages = useCallback(() => {
+  const apiKey = '41687911-62b9e6d772891b12bf67d3c73';
+  const apiUrl = `https://pixabay.com/api/?q=${query}&page=${page}&key=${apiKey}&image_type=photo&orientation=horizontal&per_page=${perPage}`;
 
-    setIsLoading(true);
+  setIsLoading(true);
 
-    fetch(apiUrl)
-      .then((response) => response.json())
-      .then((data) => {
+  fetch(apiUrl)
+    .then((response) => response.json())
+    .then((data) => {
+      if (data) {
         setImages((prevImages) => [...prevImages, ...data.hits]);
         setTotalImages(data.total);
-        setIsLoading(false);
-      })
-      .catch((error) => {
-        console.error('Error fetching images:', error);
-        setIsLoading(false);
-      });
-  }, [query, page, perPage]);
+      }
+    })
+    .catch((error) => {
+      console.error('Error fetching images:', error);
+    })
+    .finally(() => {
+      setIsLoading(false);
+    });
+}, [query, page, perPage]);
+
 
   useEffect(() => {
     if (query !== '' && page > 0) {
@@ -61,7 +65,7 @@ export const App = () => {
           onLoadMore={handleLoadMore}
         />
       )}
-      {isLoading && Loader }
+      {isLoading && <Loader />}
     </div>
   );
 };
